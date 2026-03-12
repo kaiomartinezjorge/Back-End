@@ -1,0 +1,28 @@
+<header th:fragment="header" class="topo">
+	<div class="container topo-linha">
+		<a class="marca" th:href="@{/}">
+			<img class="marca-logo" th:src="@{/img/senai.png}" alt="logo senai">
+			<div>
+				<strong>estoque senai</strong>
+				<span>sistema de estoque e patrimonio</span>
+			</div>
+		</a>
+
+		<nav class="menu">
+			<a th:href="@{/}">home</a>
+			<th:block th:if="${session.funcionarioLogadoId != null}">
+				<a th:href="@{/interna}">painel</a>
+				<a th:href="@{/categorias}">categorias</a>
+				<a th:href="@{/materiais}">materiais</a>
+				<a th:href="@{/movimentacoes}">movimentacoes</a>
+				<a th:href="@{/ativos}">ativos</a>
+				<a th:href="@{/inventario}">inventario</a>
+				<a class="botao-menu" th:href="@{/logout}">sair</a>
+			</th:block>
+			<th:block th:unless="${session.funcionarioLogadoId != null}">
+				<a th:href="@{/cadastro}">cadastro</a>
+				<a class="botao-menu" th:href="@{/login}">login</a>
+			</th:block>
+		</nav>
+	</div>
+</header>

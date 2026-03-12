@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<!-- Incluir o thymeleaf -->
+<html lang="pt-br" xmlns:th="https://thymeleaf.org">
+<link rel="stylesheet" href="style.css">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste thmeleaf</title>
+</head>                                                                         
+<body>
+    <!-- Inserir a nav bar -->
+    <div th:insert="~{fragmentos/header}"></div>
+    <h1>Seja Bem-Vindo</h1>
+    <span th:text="${msg}"></span>
+
+    <br>
+    <form action="/home" method="post">
+        Nome: <input type="text" name="nome" id="nome" placeholder="Digite seu nome">
+        <br>
+        <br>
+        <button type="submit">Enviar</button>
+
+    </form>
+</body>
+</html> 

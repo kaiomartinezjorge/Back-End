@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>nova movimentacao | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina pagina-centralizada">
+		<section class="card-formulario">
+			<h1>registrar movimentacao</h1>
+			<div class="alerta erro" th:if="${#fields.hasGlobalErrors()}" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}">
+				mensagem de erro
+			</div>
+
+			<form th:action="@{/movimentacoes/salvar}" th:object="${movimentacaoForm}" method="post" class="formulario">
+				<div class="campo">
+					<label for="materialId">material</label>
+					<select id="materialId" th:field="*{materialId}">
+						<option value="">selecione</option>
+						<option th:each="material : ${materiais}" th:value="${material.id}"
+							th:text="${material.nome + ' | estoque atual: ' + material.quantidade}">material</option>
+					</select>
+					<small th:if="${#fields.hasErrors('materialId')}" th:errors="*{materialId}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="tipo">tipo</label>
+					<select id="tipo" th:field="*{tipo}">
+						<option value="">selecione</option>
+						<option th:each="tipo : ${tiposMovimentacao}" th:value="${tipo}" th:text="${tipo}">tipo</option>
+					</select>
+					<small th:if="${#fields.hasErrors('tipo')}" th:errors="*{tipo}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="quantidade">quantidade</label>
+					<input id="quantidade" type="number" min="1" th:field="*{quantidade}" placeholder="0">
+					<small th:if="${#fields.hasErrors('quantidade')}" th:errors="*{quantidade}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="observacao">observacao</label>
+					<textarea id="observacao" th:field="*{observacao}" rows="4" placeholder="detalhe opcional da movimentacao"></textarea>
+					<small th:if="${#fields.hasErrors('observacao')}" th:errors="*{observacao}"></small>
+				</div>
+
+				<div class="acoes">
+					<button class="botao" type="submit">salvar</button>
+					<a class="botao secundario" th:href="@{/movimentacoes}">voltar</a>
+				</div>
+			</form>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

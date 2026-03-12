@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>login | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina pagina-centralizada">
+		<section class="card-formulario">
+			<h1>login do funcionario</h1>
+			<p>Entre com nif e senha para acessar as paginas internas.</p>
+
+			<div th:replace="~{fragments/mensagens :: mensagens}"></div>
+			<div class="alerta erro" th:if="${#fields.hasGlobalErrors()}" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}">
+				mensagem de erro
+			</div>
+
+			<form th:action="@{/login}" th:object="${loginForm}" method="post" class="formulario">
+				<div class="campo">
+					<label for="nif">nif</label>
+					<input id="nif" type="text" th:field="*{nif}" placeholder="digite o nif">
+					<small th:if="${#fields.hasErrors('nif')}" th:errors="*{nif}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="senha">senha</label>
+					<input id="senha" type="password" th:field="*{senha}" placeholder="digite a senha">
+					<small th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></small>
+				</div>
+
+				<button class="botao" type="submit">entrar</button>
+			</form>
+
+			<div class="bloco-ajuda">
+				<p>acesso inicial para teste:</p>
+				<p><strong>usuario:</strong> kaio | <strong>nif:</strong> 123 | <strong>senha:</strong> 1234</p>
+			</div>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

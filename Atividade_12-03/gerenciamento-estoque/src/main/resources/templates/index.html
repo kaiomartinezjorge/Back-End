@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina">
+		<section class="hero">
+			<div class="container hero-grid">
+				<div>
+					<span class="etiqueta">senai-sp</span>
+					<h1>controle simples de estoque e ativos patrimoniais</h1>
+					<p>
+						Projeto Spring Boot com cadastro de funcionarios, materiais, categorias,
+						movimentacoes de entrada e saida, inventario e controle de patrimonio.
+					</p>
+					<div class="acoes">
+						<a class="botao" th:if="${session.funcionarioLogadoId == null}" th:href="@{/login}">entrar no sistema</a>
+						<a class="botao secundario" th:if="${session.funcionarioLogadoId == null}" th:href="@{/cadastro}">fazer cadastro</a>
+						<a class="botao" th:if="${session.funcionarioLogadoId != null}" th:href="@{/interna}">abrir painel</a>
+						<a class="botao secundario" th:if="${session.funcionarioLogadoId != null}" th:href="@{/inventario}">ver inventario</a>
+					</div>
+				</div>
+
+				<div class="painel">
+					<h2>resumo rapido</h2>
+					<div class="cards cards-duas">
+						<article class="card-info">
+							<span>categorias</span>
+							<strong th:text="${totalCategorias}">0</strong>
+						</article>
+						<article class="card-info">
+							<span>materiais</span>
+							<strong th:text="${totalMateriais}">0</strong>
+						</article>
+						<article class="card-info">
+							<span>ativos</span>
+							<strong th:text="${totalAtivos}">0</strong>
+						</article>
+						<article class="card-info">
+							<span>movimentacoes</span>
+							<strong th:text="${totalMovimentacoes}">0</strong>
+						</article>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<section class="secao">
+			<div class="container">
+				<div class="titulo-secao">
+					<div>
+						<h2>ultimas movimentacoes</h2>
+						<p>Historico recente de entradas e saidas registradas no sistema.</p>
+					</div>
+				</div>
+
+				<div class="tabela-area">
+					<table class="tabela">
+						<thead>
+							<tr>
+								<th>material</th>
+								<th>tipo</th>
+								<th>quantidade</th>
+								<th>funcionario</th>
+								<th>data</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${#lists.isEmpty(movimentacoesRecentes)}">
+								<td colspan="5">Nenhuma movimentacao encontrada.</td>
+							</tr>
+							<tr th:each="movimentacao : ${movimentacoesRecentes}">
+								<td th:text="${movimentacao.material.nome}">material</td>
+								<td>
+									<span class="tag"
+										th:classappend="${movimentacao.tipo.name() == 'ENTRADA'} ? 'tag-entrada' : 'tag-saida'"
+										th:text="${movimentacao.tipo}">ENTRADA</span>
+								</td>
+								<td th:text="${movimentacao.quantidade}">0</td>
+								<td th:text="${movimentacao.funcionario.nome}">funcionario</td>
+								<td th:text="${#temporals.format(movimentacao.data, 'dd/MM/yyyy HH:mm')}">00/00/0000</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

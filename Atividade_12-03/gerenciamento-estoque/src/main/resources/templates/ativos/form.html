@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>formulario ativo | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina pagina-centralizada">
+		<section class="card-formulario">
+			<h1 th:text="${titulo}">ativo patrimonial</h1>
+			<div class="alerta erro" th:if="${#fields.hasGlobalErrors()}" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}">
+				mensagem de erro
+			</div>
+
+			<form th:action="${acao}" th:object="${ativoPatrimonialForm}" method="post" class="formulario">
+				<div class="campo">
+					<label for="nome">nome</label>
+					<input id="nome" type="text" th:field="*{nome}" placeholder="nome do ativo">
+					<small th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="descricao">descricao</label>
+					<textarea id="descricao" th:field="*{descricao}" rows="4" placeholder="descreva o ativo"></textarea>
+					<small th:if="${#fields.hasErrors('descricao')}" th:errors="*{descricao}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="numeroPatrimonio">numero patrimonial</label>
+					<input id="numeroPatrimonio" type="text" th:field="*{numeroPatrimonio}" placeholder="PAT-001">
+					<small th:if="${#fields.hasErrors('numeroPatrimonio')}" th:errors="*{numeroPatrimonio}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="localizacao">localizacao</label>
+					<input id="localizacao" type="text" th:field="*{localizacao}" placeholder="laboratorio 1">
+					<small th:if="${#fields.hasErrors('localizacao')}" th:errors="*{localizacao}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="status">status</label>
+					<select id="status" th:field="*{status}">
+						<option value="">selecione</option>
+						<option th:each="status : ${statusDisponiveis}" th:value="${status}" th:text="${status}">status</option>
+					</select>
+					<small th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="categoriaId">categoria</label>
+					<select id="categoriaId" th:field="*{categoriaId}">
+						<option value="">selecione</option>
+						<option th:each="categoria : ${categorias}" th:value="${categoria.id}" th:text="${categoria.nome}">categoria</option>
+					</select>
+					<small th:if="${#fields.hasErrors('categoriaId')}" th:errors="*{categoriaId}"></small>
+				</div>
+
+				<div class="acoes">
+					<button class="botao" type="submit">salvar</button>
+					<a class="botao secundario" th:href="@{/ativos}">voltar</a>
+				</div>
+			</form>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>cadastro | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina pagina-centralizada">
+		<section class="card-formulario">
+			<h1>cadastro de funcionario</h1>
+			<p>O cadastro so e liberado para funcionarios autorizados por nome e nif.</p>
+
+			<div th:replace="~{fragments/mensagens :: mensagens}"></div>
+			<div class="alerta erro" th:if="${#fields.hasGlobalErrors()}" th:each="erro : ${#fields.globalErrors()}" th:text="${erro}">
+				mensagem de erro
+			</div>
+
+			<form th:action="@{/cadastro}" th:object="${funcionarioCadastroForm}" method="post" class="formulario">
+				<div class="campo">
+					<label for="nome">nome</label>
+					<input id="nome" type="text" th:field="*{nome}" placeholder="nome completo">
+					<small th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="nif">nif</label>
+					<input id="nif" type="text" th:field="*{nif}" placeholder="nif autorizado">
+					<small th:if="${#fields.hasErrors('nif')}" th:errors="*{nif}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="senha">senha</label>
+					<input id="senha" type="password" th:field="*{senha}" placeholder="crie uma senha">
+					<small th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></small>
+				</div>
+
+				<div class="campo">
+					<label for="confirmarSenha">confirmar senha</label>
+					<input id="confirmarSenha" type="password" th:field="*{confirmarSenha}" placeholder="repita a senha">
+					<small th:if="${#fields.hasErrors('confirmarSenha')}" th:errors="*{confirmarSenha}"></small>
+				</div>
+
+				<button class="botao" type="submit">cadastrar</button>
+			</form>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
