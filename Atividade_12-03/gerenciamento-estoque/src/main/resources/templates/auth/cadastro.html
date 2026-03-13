@@ -19,7 +19,7 @@
 				mensagem de erro
 			</div>
 
-			<form th:action="@{/cadastro}" th:object="${funcionarioCadastroForm}" method="post" class="formulario">
+			<form th:action="@{/cadastro}" th:object="${funcionario}" method="post" class="formulario">
 				<div class="campo">
 					<label for="nome">nome</label>
 					<input id="nome" type="text" th:field="*{nome}" placeholder="nome completo">

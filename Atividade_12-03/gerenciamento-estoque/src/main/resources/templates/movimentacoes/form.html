@@ -16,15 +16,12 @@
 				mensagem de erro
 			</div>
 
-			<form th:action="@{/movimentacoes/salvar}" th:object="${movimentacaoForm}" method="post" class="formulario">
+			<form th:action="@{/movimentacoes/salvar}" th:object="${movimentacao}" method="post" class="formulario">
 				<div class="campo">
-					<label for="materialId">material</label>
-					<select id="materialId" th:field="*{materialId}">
-						<option value="">selecione</option>
-						<option th:each="material : ${materiais}" th:value="${material.id}"
-							th:text="${material.nome + ' | estoque atual: ' + material.quantidade}">material</option>
-					</select>
-					<small th:if="${#fields.hasErrors('materialId')}" th:errors="*{materialId}"></small>
+					<label for="materialNome">material</label>
+					<input id="materialNome" type="text" th:field="*{materialNome}" placeholder="digite o nome do material">
+					<small th:if="${#fields.hasErrors('materialNome')}" th:errors="*{materialNome}"></small>
+					<small>Primeiro cadastre o material na tela de materiais e depois informe o nome aqui.</small>
 				</div>
 
 				<div class="campo">

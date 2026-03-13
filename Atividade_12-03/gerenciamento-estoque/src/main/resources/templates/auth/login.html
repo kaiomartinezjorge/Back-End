@@ -19,7 +19,7 @@
 				mensagem de erro
 			</div>
 
-			<form th:action="@{/login}" th:object="${loginForm}" method="post" class="formulario">
+			<form th:action="@{/login}" th:object="${funcionario}" method="post" class="formulario">
 				<div class="campo">
 					<label for="nif">nif</label>
 					<input id="nif" type="text" th:field="*{nif}" placeholder="digite o nif">

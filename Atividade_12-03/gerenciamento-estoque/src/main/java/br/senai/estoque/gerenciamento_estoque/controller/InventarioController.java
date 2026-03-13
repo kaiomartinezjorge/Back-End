@@ -5,30 +5,26 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import br.senai.estoque.gerenciamento_estoque.service.AtivoPatrimonialService;
-import br.senai.estoque.gerenciamento_estoque.service.MaterialService;
-import br.senai.estoque.gerenciamento_estoque.service.SessaoService;
+import br.senai.estoque.gerenciamento_estoque.repository.AtivoPatrimonialRepository;
+import br.senai.estoque.gerenciamento_estoque.repository.MateriaisRepository;
 import jakarta.servlet.http.HttpSession;
 
 @Controller
-public class InventarioController {
+public class InventarioController extends ControllerBase {
 
 	@Autowired
-	private MaterialService materialService;
+	private MateriaisRepository materiaisRepository;
 
 	@Autowired
-	private AtivoPatrimonialService ativoPatrimonialService;
-
-	@Autowired
-	private SessaoService sessaoService;
+	private AtivoPatrimonialRepository ativoPatrimonialRepository;
 
 	@GetMapping("/inventario")
 	public String visualizarInventario(Model model, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
-		model.addAttribute("materiais", materialService.listarTodos());
-		model.addAttribute("ativos", ativoPatrimonialService.listarTodos());
+		model.addAttribute("materiais", materiaisRepository.findAllByOrderByNomeAsc());
+		model.addAttribute("ativos", ativoPatrimonialRepository.findAllByOrderByNomeAsc());
 		return "inventario/lista";
 	}
 }

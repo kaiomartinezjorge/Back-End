@@ -11,7 +11,7 @@ public interface AtivoPatrimonialRepository extends JpaRepository<AtivoPatrimoni
 
 	List<AtivoPatrimonial> findAllByOrderByNomeAsc();
 
-	boolean existsByCategoriaId(Long categoriaId);
+	boolean existsByCategoria_Id(Long categoriaId);
 
 	boolean existsByNumeroPatrimonioIgnoreCase(String numeroPatrimonio);
 

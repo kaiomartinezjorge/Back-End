@@ -15,8 +15,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
@@ -42,15 +42,16 @@ public class Materiais {
 	@Column(nullable = false)
 	private int quantidade = 0;
 
-	@NotNull(message = "selecione uma categoria")
 	@ManyToOne
 	@JoinColumn(name = "categoria_id", nullable = false)
 	private Categoria categoria;
 
-	@NotNull(message = "o material precisa de um funcionario responsavel")
 	@ManyToOne
 	@JoinColumn(name = "criado_por_id", nullable = false)
 	private Funcionario criadoPor;
+
+	@Transient
+	private Long categoriaId;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "material", cascade = CascadeType.ALL)
@@ -102,6 +103,14 @@ public class Materiais {
 
 	public void setCriadoPor(Funcionario criadoPor) {
 		this.criadoPor = criadoPor;
+	}
+
+	public Long getCategoriaId() {
+		return categoriaId;
+	}
+
+	public void setCategoriaId(Long categoriaId) {
+		this.categoriaId = categoriaId;
 	}
 
 	public List<Movimentacao> getMovimentacoes() {

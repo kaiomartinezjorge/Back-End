@@ -1,5 +1,7 @@
 package br.senai.estoque.gerenciamento_estoque.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,135 +12,158 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import br.senai.estoque.gerenciamento_estoque.dto.MaterialForm;
+import br.senai.estoque.gerenciamento_estoque.model.Categoria;
 import br.senai.estoque.gerenciamento_estoque.model.Funcionario;
 import br.senai.estoque.gerenciamento_estoque.model.Materiais;
-import br.senai.estoque.gerenciamento_estoque.service.CategoriaService;
-import br.senai.estoque.gerenciamento_estoque.service.MaterialService;
-import br.senai.estoque.gerenciamento_estoque.service.SessaoService;
+import br.senai.estoque.gerenciamento_estoque.repository.CategoriaRepository;
+import br.senai.estoque.gerenciamento_estoque.repository.MateriaisRepository;
+import br.senai.estoque.gerenciamento_estoque.repository.MovimentacaoRepository;
 import jakarta.servlet.http.HttpSession;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 @Controller
-public class MaterialController {
+public class MaterialController extends ControllerBase {
 
 	@Autowired
-	private MaterialService materialService;
+	private MateriaisRepository materiaisRepository;
 
 	@Autowired
-	private CategoriaService categoriaService;
+	private MovimentacaoRepository movimentacaoRepository;
 
 	@Autowired
-	private SessaoService sessaoService;
+	private CategoriaRepository categoriaRepository;
 
 	@GetMapping("/materiais")
 	public String listarMateriais(Model model, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
-		model.addAttribute("materiais", materialService.listarTodos());
+		model.addAttribute("materiais", materiaisRepository.findAllByOrderByNomeAsc());
 		return "materiais/lista";
 	}
 
 	@GetMapping("/materiais/novo")
 	public String novoMaterial(Model model, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
-		prepararFormulario(model, new MaterialForm(), "novo material", "/materiais/salvar", 0);
+		prepararFormulario(model, new Materiais(), "novo material", "/materiais/salvar", 0);
 		return "materiais/form";
 	}
 
 	@PostMapping("/materiais/salvar")
-	public String salvarMaterial(@Valid @ModelAttribute("materialForm") MaterialForm materialForm,
-			BindingResult result, Model model, RedirectAttributes attributes, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+	@Transactional
+	public String salvarMaterial(@Valid @ModelAttribute("material") Materiais material, BindingResult result,
+			Model model, RedirectAttributes attributes, HttpSession session) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
+
+		prepararMaterial(material);
+		Categoria categoria = buscarCategoria(material.getCategoriaId(), result);
 		if (result.hasErrors()) {
-			prepararFormulario(model, materialForm, "novo material", "/materiais/salvar", 0);
+			prepararFormulario(model, material, "novo material", "/materiais/salvar", 0);
 			return "materiais/form";
 		}
 
-		try {
-			Funcionario funcionario = sessaoService.buscarFuncionarioLogado(session);
-			materialService.salvar(materialForm, funcionario);
-			attributes.addFlashAttribute("mensagem", "material cadastrado com sucesso");
-			attributes.addFlashAttribute("tipoMensagem", "sucesso");
-			return "redirect:/materiais";
-		} catch (IllegalArgumentException ex) {
-			result.reject("material.invalido", ex.getMessage());
-			prepararFormulario(model, materialForm, "novo material", "/materiais/salvar", 0);
-			return "materiais/form";
-		}
+		Funcionario funcionario = buscarFuncionarioLogado(session);
+		material.setCategoria(categoria);
+		material.setCriadoPor(funcionario);
+		material.setQuantidade(0);
+		materiaisRepository.save(material);
+
+		attributes.addFlashAttribute("mensagem", "material cadastrado com sucesso");
+		attributes.addFlashAttribute("tipoMensagem", "sucesso");
+		return "redirect:/materiais";
 	}
 
 	@GetMapping("/materiais/editar/{id}")
 	public String editarMaterial(@PathVariable Long id, Model model, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
-		Materiais material = materialService.buscarPorId(id);
-		MaterialForm materialForm = new MaterialForm();
-		materialForm.setNome(material.getNome());
-		materialForm.setDescricao(material.getDescricao());
-		materialForm.setCategoriaId(material.getCategoria().getId());
-
-		prepararFormulario(model, materialForm, "editar material", "/materiais/atualizar/" + id,
-				material.getQuantidade());
+		Materiais material = buscarMaterial(id);
+		material.setCategoriaId(material.getCategoria().getId());
+		prepararFormulario(model, material, "editar material", "/materiais/atualizar/" + id, material.getQuantidade());
 		return "materiais/form";
 	}
 
 	@PostMapping("/materiais/atualizar/{id}")
-	public String atualizarMaterial(@PathVariable Long id, @Valid @ModelAttribute("materialForm") MaterialForm materialForm,
+	@Transactional
+	public String atualizarMaterial(@PathVariable Long id, @Valid @ModelAttribute("material") Materiais materialForm,
 			BindingResult result, Model model, RedirectAttributes attributes, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
+		if (!estaLogado(session)) {
 			return "redirect:/login";
 		}
-		Materiais material = materialService.buscarPorId(id);
 
+		Materiais material = buscarMaterial(id);
+		prepararMaterial(materialForm);
+		Categoria categoria = buscarCategoria(materialForm.getCategoriaId(), result);
 		if (result.hasErrors()) {
-			prepararFormulario(model, materialForm, "editar material", "/materiais/atualizar/" + id,
-					material.getQuantidade());
+			materialForm.setQuantidade(material.getQuantidade());
+			prepararFormulario(model, materialForm, "editar material", "/materiais/atualizar/" + id, material.getQuantidade());
 			return "materiais/form";
 		}
 
-		try {
-			materialService.atualizar(id, materialForm);
-			attributes.addFlashAttribute("mensagem", "material atualizado com sucesso");
-			attributes.addFlashAttribute("tipoMensagem", "sucesso");
-			return "redirect:/materiais";
-		} catch (IllegalArgumentException ex) {
-			result.reject("material.invalido", ex.getMessage());
-			prepararFormulario(model, materialForm, "editar material", "/materiais/atualizar/" + id,
-					material.getQuantidade());
-			return "materiais/form";
-		}
-	}
+		material.setNome(materialForm.getNome());
+		material.setDescricao(materialForm.getDescricao());
+		material.setCategoria(categoria);
+		materiaisRepository.save(material);
 
-	@PostMapping("/materiais/excluir/{id}")
-	public String excluirMaterial(@PathVariable Long id, RedirectAttributes attributes, HttpSession session) {
-		if (!sessaoService.estaLogado(session)) {
-			return "redirect:/login";
-		}
-		try {
-			materialService.excluir(id);
-			attributes.addFlashAttribute("mensagem", "material excluido com sucesso");
-			attributes.addFlashAttribute("tipoMensagem", "sucesso");
-		} catch (IllegalArgumentException ex) {
-			attributes.addFlashAttribute("mensagem", ex.getMessage());
-			attributes.addFlashAttribute("tipoMensagem", "erro");
-		}
-
+		attributes.addFlashAttribute("mensagem", "material atualizado com sucesso");
+		attributes.addFlashAttribute("tipoMensagem", "sucesso");
 		return "redirect:/materiais";
 	}
 
-	private void prepararFormulario(Model model, MaterialForm materialForm, String titulo, String acao,
-			int quantidadeAtual) {
-		model.addAttribute("materialForm", materialForm);
+	@PostMapping("/materiais/excluir/{id}")
+	@Transactional
+	public String excluirMaterial(@PathVariable Long id, RedirectAttributes attributes, HttpSession session) {
+		if (!estaLogado(session)) {
+			return "redirect:/login";
+		}
+
+		if (movimentacaoRepository.existsByMaterial_Id(id)) {
+			attributes.addFlashAttribute("mensagem", "o material possui movimentacoes e nao pode ser excluido");
+			attributes.addFlashAttribute("tipoMensagem", "erro");
+			return "redirect:/materiais";
+		}
+
+		materiaisRepository.delete(buscarMaterial(id));
+		attributes.addFlashAttribute("mensagem", "material excluido com sucesso");
+		attributes.addFlashAttribute("tipoMensagem", "sucesso");
+		return "redirect:/materiais";
+	}
+
+	private Materiais buscarMaterial(Long id) {
+		return materiaisRepository.findById(id)
+				.orElseThrow(() -> new IllegalArgumentException("material nao encontrado"));
+	}
+
+	private Categoria buscarCategoria(Long categoriaId, BindingResult result) {
+		if (categoriaId == null) {
+			result.rejectValue("categoriaId", "material.categoriaId", "selecione uma categoria");
+			return null;
+		}
+
+		return categoriaRepository.findById(categoriaId)
+				.orElseGet(() -> {
+					result.rejectValue("categoriaId", "material.categoriaId", "categoria nao encontrada");
+					return null;
+				});
+	}
+
+	private void prepararMaterial(Materiais material) {
+		material.setNome(limparTexto(material.getNome()));
+		material.setDescricao(limparTexto(material.getDescricao()));
+	}
+
+	private void prepararFormulario(Model model, Materiais material, String titulo, String acao, int quantidadeAtual) {
+		List<Categoria> categorias = categoriaRepository.findAllByOrderByNomeAsc();
+		model.addAttribute("material", material);
 		model.addAttribute("titulo", titulo);
 		model.addAttribute("acao", acao);
 		model.addAttribute("quantidadeAtual", quantidadeAtual);
-		model.addAttribute("categorias", categoriaService.listarTodas());
+		model.addAttribute("categorias", categorias);
 	}
 }

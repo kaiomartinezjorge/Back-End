@@ -10,5 +10,5 @@ public interface MovimentacaoRepository extends JpaRepository<Movimentacao, Long
 
 	List<Movimentacao> findAllByOrderByDataDesc();
 
-	boolean existsByMaterialId(Long materialId);
+	boolean existsByMaterial_Id(Long materialId);
 }

@@ -13,9 +13,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "movimentacoes")
@@ -28,12 +29,10 @@ public class Movimentacao {
 	@Column(nullable = false)
 	private LocalDateTime data;
 
-	@NotNull(message = "selecione um material")
 	@ManyToOne
 	@JoinColumn(name = "material_id", nullable = false)
 	private Materiais material;
 
-	@NotNull(message = "o funcionario da movimentacao e obrigatorio")
 	@ManyToOne
 	@JoinColumn(name = "funcionario_id", nullable = false)
 	private Funcionario funcionario;
@@ -50,6 +49,12 @@ public class Movimentacao {
 	@Size(max = 255, message = "a observacao pode ter no maximo 255 caracteres")
 	@Column(length = 255)
 	private String observacao;
+
+	@Transient
+	private Long materialId;
+
+	@Transient
+	private String materialNome;
 
 	@PrePersist
 	public void prepararData() {
@@ -112,5 +117,21 @@ public class Movimentacao {
 
 	public void setObservacao(String observacao) {
 		this.observacao = observacao;
+	}
+
+	public Long getMaterialId() {
+		return materialId;
+	}
+
+	public void setMaterialId(Long materialId) {
+		this.materialId = materialId;
+	}
+
+	public String getMaterialNome() {
+		return materialNome;
+	}
+
+	public void setMaterialNome(String materialNome) {
+		this.materialNome = materialNome;
 	}
 }

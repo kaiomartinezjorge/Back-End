@@ -13,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
@@ -41,6 +42,9 @@ public class Funcionario {
 
 	@Column(nullable = false)
 	private boolean ativo = true;
+
+	@Transient
+	private String confirmarSenha;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "criadoPor", cascade = CascadeType.ALL)
@@ -92,6 +96,14 @@ public class Funcionario {
 
 	public void setAtivo(boolean ativo) {
 		this.ativo = ativo;
+	}
+
+	public String getConfirmarSenha() {
+		return confirmarSenha;
+	}
+
+	public void setConfirmarSenha(String confirmarSenha) {
+		this.confirmarSenha = confirmarSenha;
 	}
 
 	public List<Materiais> getMateriaisCriados() {

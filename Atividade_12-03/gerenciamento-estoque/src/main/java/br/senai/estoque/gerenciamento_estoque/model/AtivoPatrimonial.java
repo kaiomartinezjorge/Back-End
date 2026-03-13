@@ -11,8 +11,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 @Entity
@@ -48,15 +48,16 @@ public class AtivoPatrimonial {
 	@Column(nullable = false, length = 40)
 	private String status;
 
-	@NotNull(message = "selecione uma categoria")
 	@ManyToOne
 	@JoinColumn(name = "categoria_id", nullable = false)
 	private Categoria categoria;
 
-	@NotNull(message = "o ativo precisa de um funcionario responsavel")
 	@ManyToOne
 	@JoinColumn(name = "cadastrado_por_id", nullable = false)
 	private Funcionario cadastradoPor;
+
+	@Transient
+	private Long categoriaId;
 
 	@Column(nullable = false)
 	private LocalDateTime dataCadastro;
@@ -130,6 +131,14 @@ public class AtivoPatrimonial {
 
 	public void setCadastradoPor(Funcionario cadastradoPor) {
 		this.cadastradoPor = cadastradoPor;
+	}
+
+	public Long getCategoriaId() {
+		return categoriaId;
+	}
+
+	public void setCategoriaId(Long categoriaId) {
+		this.categoriaId = categoriaId;
 	}
 
 	public LocalDateTime getDataCadastro() {
