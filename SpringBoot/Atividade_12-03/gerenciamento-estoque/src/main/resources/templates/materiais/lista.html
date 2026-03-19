@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>materiais | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina">
+		<section class="secao">
+			<div class="container">
+				<div th:replace="~{fragments/mensagens :: mensagens}"></div>
+
+				<div class="titulo-secao">
+					<div>
+						<h1>materiais</h1>
+						<p>Cadastre materiais e acompanhe a quantidade atual pelo estoque.</p>
+					</div>
+					<a class="botao" th:href="@{/materiais/novo}">novo material</a>
+				</div>
+
+				<div class="tabela-area">
+					<table class="tabela">
+						<thead>
+							<tr>
+								<th>nome</th>
+								<th>descricao</th>
+								<th>categoria</th>
+								<th>quantidade</th>
+								<th>acoes</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${#lists.isEmpty(materiais)}">
+								<td colspan="5">Nenhum material cadastrado.</td>
+							</tr>
+							<tr th:each="material : ${materiais}">
+								<td th:text="${material.nome}">nome</td>
+								<td th:text="${material.descricao}">descricao</td>
+								<td th:text="${material.categoria.nome}">categoria</td>
+								<td th:text="${material.quantidade}">0</td>
+								<td class="acoes-tabela">
+									<a class="botao-link" th:href="@{/movimentacoes/nova(materialId=${material.id})}">movimentar</a>
+									<a class="botao-link" th:href="@{/materiais/editar/{id}(id=${material.id})}">editar</a>
+									<form th:action="@{/materiais/excluir/{id}(id=${material.id})}" method="post">
+										<button class="botao-link botao-link-perigo" type="submit">excluir</button>
+									</form>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

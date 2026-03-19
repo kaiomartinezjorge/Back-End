@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>painel | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina">
+		<section class="secao">
+			<div class="container">
+				<div th:replace="~{fragments/mensagens :: mensagens}"></div>
+
+				<div class="titulo-secao">
+					<div>
+						<h1>painel interno</h1>
+						<p th:text="'ola, ' + ${funcionarioLogado.nome} + '. acompanhe o resumo do sistema.'">ola</p>
+					</div>
+					<div class="acoes">
+						<a class="botao" th:href="@{/movimentacoes/nova}">nova movimentacao</a>
+						<a class="botao secundario" th:href="@{/inventario}">abrir inventario</a>
+					</div>
+				</div>
+
+				<div class="cards cards-quatro">
+					<article class="card-info">
+						<span>categorias</span>
+						<strong th:text="${totalCategorias}">0</strong>
+					</article>
+					<article class="card-info">
+						<span>materiais</span>
+						<strong th:text="${totalMateriais}">0</strong>
+					</article>
+					<article class="card-info">
+						<span>ativos</span>
+						<strong th:text="${totalAtivos}">0</strong>
+					</article>
+					<article class="card-info">
+						<span>movimentacoes</span>
+						<strong th:text="${totalMovimentacoes}">0</strong>
+					</article>
+				</div>
+
+				<div class="layout-duplo">
+					<section class="painel">
+						<h2>movimentacoes recentes</h2>
+						<table class="tabela">
+							<thead>
+								<tr>
+									<th>material</th>
+									<th>tipo</th>
+									<th>quantidade</th>
+									<th>data</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:if="${#lists.isEmpty(movimentacoesRecentes)}">
+									<td colspan="4">Nenhuma movimentacao encontrada.</td>
+								</tr>
+								<tr th:each="movimentacao : ${movimentacoesRecentes}">
+									<td th:text="${movimentacao.material.nome}">material</td>
+									<td th:text="${movimentacao.tipo}">ENTRADA</td>
+									<td th:text="${movimentacao.quantidade}">0</td>
+									<td th:text="${#temporals.format(movimentacao.data, 'dd/MM/yyyy HH:mm')}">00/00/0000</td>
+								</tr>
+							</tbody>
+						</table>
+					</section>
+
+					<section class="painel">
+						<h2>materiais sem estoque</h2>
+						<ul class="lista-simples" th:if="${!#lists.isEmpty(materiaisSemEstoque)}">
+							<li th:each="material : ${materiaisSemEstoque}" th:text="${material.nome}">material</li>
+						</ul>
+						<p th:if="${#lists.isEmpty(materiaisSemEstoque)}">Nenhum material sem estoque no momento.</p>
+					</section>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>

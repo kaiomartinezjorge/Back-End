@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>categorias | estoque senai</title>
+	<link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+	<div th:replace="~{fragments/header :: header}"></div>
+
+	<main class="pagina">
+		<section class="secao">
+			<div class="container">
+				<div th:replace="~{fragments/mensagens :: mensagens}"></div>
+
+				<div class="titulo-secao">
+					<div>
+						<h1>categorias</h1>
+						<p>Cadastre e organize os grupos usados em materiais e ativos.</p>
+					</div>
+					<a class="botao" th:href="@{/categorias/nova}">nova categoria</a>
+				</div>
+
+				<div class="tabela-area">
+					<table class="tabela">
+						<thead>
+							<tr>
+								<th>nome</th>
+								<th>descricao</th>
+								<th>acoes</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr th:if="${#lists.isEmpty(categorias)}">
+								<td colspan="3">Nenhuma categoria cadastrada.</td>
+							</tr>
+							<tr th:each="categoria : ${categorias}">
+								<td th:text="${categoria.nome}">nome</td>
+								<td th:text="${categoria.descricao} ?: 'sem descricao'">descricao</td>
+								<td class="acoes-tabela">
+									<a class="botao-link" th:href="@{/categorias/editar/{id}(id=${categoria.id})}">editar</a>
+									<form th:action="@{/categorias/excluir/{id}(id=${categoria.id})}" method="post">
+										<button class="botao-link botao-link-perigo" type="submit">excluir</button>
+									</form>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<div th:replace="~{fragments/footer :: footer}"></div>
+</body>
+</html>
